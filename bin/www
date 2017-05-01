@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('twitter-ex:server');
 var http = require('http');
-var mongo = require('../mongo');
+var mongo = require('../db/conn');
 
 /**
  * Get port from environment and store in Express.
