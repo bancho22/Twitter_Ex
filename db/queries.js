@@ -4,11 +4,11 @@ export function getNumOfUsers(coll){
     return new Promise((resolve, reject) => {
         coll.distinct('user')
             .then(distinctUsers => {
-                console.log('User count from mongo:', distinctUsers.length)
+                //console.log('User count from mongo:', distinctUsers.length)
                 return resolve(distinctUsers.length)
             })
             .catch(err => {
-                console.log(err)
+                //console.log(err)
                 return reject(err)
             })
     })
@@ -24,7 +24,7 @@ export function getTweetsWithMentionsByUser(coll){
 
         cur.toArray()
             .then(res => {
-                console.log(res)
+                //console.log(res)
                 return resolve(res)
             })
             .catch(err => {
@@ -43,7 +43,7 @@ export function getTweetsWithMentions(coll){
 
         cur.toArray()
             .then(res => {
-                // console.log(res)
+                // //console.log(res)
                 return resolve(res[0].text)
             })
             .catch(err => {
@@ -63,7 +63,7 @@ export function getMostActiveUsers(coll, limit){
 
         cur.toArray()
             .then(res => {
-                console.log(res)
+                //console.log(res)
                 return resolve(res)
             })
             .catch(err => {
@@ -84,7 +84,7 @@ export function getMostPositiveUsers(coll, limit){
 
         cur.toArray()
             .then(res => {
-                console.log(res)
+                //console.log(res)
                 return resolve(res)
             })
             .catch(err => {
@@ -105,7 +105,7 @@ export function getMostNegativeUsers(coll, limit){
 
         cur.toArray()
             .then(res => {
-                console.log(res)
+                //console.log(res)
                 return resolve(res)
             })
             .catch(err => {
