@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('twitter-ex:server');
 var http = require('http');
+var mongo = require('../mongo');
 
 /**
  * Get port from environment and store in Express.
@@ -14,6 +15,21 @@ var http = require('http');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+
+
+/**
+ * Connect to Mongo.
+ */
+
+mongo.connect()
+    .then(() => {
+        console.log('Successfully connected to MongoDB')
+    })
+    .catch(err => {
+        console.log('Error while connecting to mongo', err)
+    })
+
+
 
 /**
  * Create HTTP server.
