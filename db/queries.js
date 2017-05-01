@@ -52,3 +52,24 @@ export function getMostActiveUsers(coll, limit){
             })
     })
 }
+
+
+export function getMostPositiveUsers(coll, limit){
+    return new Promise((resolve, reject) => {
+        let cur = coll.aggregate([
+            {$match: {polarity: 4}},
+            {$group: {_id: '$user', count: {$sum: 1}}},
+            {$sort: {count: -1}},
+            {$limit: limit}
+        ])
+
+        cur.toArray()
+            .then(res => {
+                console.log(res)
+                return resolve(res)
+            })
+            .catch(err => {
+                return reject(err)
+            })
+    })
+}

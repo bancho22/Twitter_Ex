@@ -1,7 +1,7 @@
 'use strict'
 
 import * as db from '../db/conn'
-import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers } from '../db/queries'
+import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers, getMostPositiveUsers } from '../db/queries'
 import { extractMostMentionedUsers } from '../utils'
 
 import express from 'express'
@@ -19,12 +19,19 @@ router.get('/user-count', (req, res) => {
 })
 
 
-
 router.get('/most-mentioned/:limit', (req, res) => {
     let limit = parseInt(req.params.limit)
     getTweetsWithMentions(db.get().collection('tweets'))
         .then(tweets => {
-            let mostMentioned = extractMostMentionedUsers(tweets, limit)
+            let userMentions = extractMostMentionedUsers(tweets, limit)
+            let mostMentioned = []
+            Object.keys(userMentions).forEach((user, i) => {
+                mostMentioned.push({
+                    user: user,
+                    mentions: userMentions[user],
+                    place: i + 1
+                })
+            })
             return res.status(200).json(mostMentioned)
         })
         .catch(err => {
@@ -41,7 +48,7 @@ router.get('/most-active/:limit', (req, res) => {
             mostActive = mostActive.map((e, i) => {
                 return {
                     user: e._id,
-                    num_of_tweets: e.count,
+                    tweets: e.count,
                     place: i + 1
                 }
             })
@@ -50,6 +57,25 @@ router.get('/most-active/:limit', (req, res) => {
         .catch(err => {
             console.log(err)
             return res.status(500).json({err: err.toString()})
+        })
+})
+
+
+router.get('/most-positive/:limit', (req, res) => {
+    let limit = parseInt(req.params.limit)
+    getMostPositiveUsers(db.get().collection('tweets'), limit)
+        .then(mostPositive => {
+            mostPositive = mostPositive.map((e, i) => {
+                return {
+                    user: e._id,
+                    positive_tweets: e.count,
+                    place: i + 1
+                }
+            })
+            return res.status(200).json(mostPositive)
+        })
+        .catch(err => {
+            return res.status(500).json({err})
         })
 })
 
