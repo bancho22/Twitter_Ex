@@ -1,7 +1,7 @@
 'use strict'
 
 import * as db from '../db/conn'
-import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers, getMostPositiveUsers } from '../db/queries'
+import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers, getMostPositiveUsers, getMostNegativeUsers } from '../db/queries'
 import { extractMostMentionedUsers } from '../utils'
 
 import express from 'express'
@@ -78,5 +78,25 @@ router.get('/most-positive/:limit', (req, res) => {
             return res.status(500).json({err})
         })
 })
+
+
+router.get('/most-negative/:limit', (req, res) => {
+    let limit = parseInt(req.params.limit)
+    getMostNegativeUsers(db.get().collection('tweets'), limit)
+        .then(mostNegative => {
+            mostNegative = mostNegative.map((e, i) => {
+                return {
+                    user: e._id,
+                    negative_tweets: e.count,
+                    place: i + 1
+                }
+            })
+            return res.status(200).json(mostNegative)
+        })
+        .catch(err => {
+            return res.status(500).json({err})
+        })
+})
+
 
 module.exports = router
