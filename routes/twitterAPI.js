@@ -1,8 +1,18 @@
 'use strict'
 
 import * as db from '../db/conn'
-import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers, getMostPositiveUsers, getMostNegativeUsers } from '../db/queries'
-import { extractMostMentionedUsers } from '../utils'
+import {
+    getNumOfUsers,
+    getTweetsWithMentionsByUser,
+    getTweetsWithMentions,
+    getMostActiveUsers,
+    getMostPositiveUsers,
+    getMostNegativeUsers
+} from '../db/queries'
+import {
+    extractMostMentionedUsers,
+    extractMostMentioningUsers
+} from '../utils'
 
 import express from 'express'
 let router = express.Router()
@@ -15,6 +25,37 @@ router.get('/user-count', (req, res) => {
         })
         .catch(err => {
             return res.status(500).json({err})
+        })
+})
+
+
+router.get('/most-mentioning/:limit', (req, res) => {
+    let limit = parseInt(req.params.limit)
+    getTweetsWithMentionsByUser(db.get().collection('tweets'))
+        .then(tweetsByUser => {
+
+            tweetsByUser = tweetsByUser.map(e => {
+                return {
+                    user: e._id,
+                    tweets: e.text
+                }
+            })
+
+            let usersMentioning = extractMostMentioningUsers(tweetsByUser, limit)
+            let mostMentioning = []
+            Object.keys(usersMentioning).forEach((user, i) => {
+                mostMentioning.push({
+                    user: user,
+                    mentions_of_others: usersMentioning[user],
+                    place: i + 1
+                })
+            })
+
+            return res.status(200).json(mostMentioning)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(500).json({err: err.toString()})
         })
 })
 
