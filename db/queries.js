@@ -13,3 +13,23 @@ export function getNumOfUsers(coll){
             })
     })
 }
+
+
+export function getMostActiveUsers(coll, limit){
+    return new Promise((resolve, reject) => {
+        let cur = coll.aggregate([
+            {$group: {_id: '$user', count: {$sum: 1}}},
+            {$sort: {count: -1}},
+            {$limit: limit}
+        ])
+
+        cur.toArray()
+            .then(res => {
+                console.log(res)
+                return resolve(res)
+            })
+            .catch(err => {
+                return reject(err)
+            })
+    })
+}
