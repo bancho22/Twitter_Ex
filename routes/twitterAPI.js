@@ -1,7 +1,8 @@
 'use strict'
 
 import * as db from '../db/conn'
-import { getNumOfUsers, getMostActiveUsers } from '../db/queries'
+import { getNumOfUsers, getTweetsWithMentions, getMostActiveUsers } from '../db/queries'
+import { extractMostMentionedUsers } from '../utils'
 
 import express from 'express'
 let router = express.Router()
@@ -14,6 +15,21 @@ router.get('/user-count', (req, res) => {
         })
         .catch(err => {
             return res.status(500).json({err})
+        })
+})
+
+
+
+router.get('/most-mentioned/:limit', (req, res) => {
+    let limit = parseInt(req.params.limit)
+    getTweetsWithMentions(db.get().collection('tweets'))
+        .then(tweets => {
+            let mostMentioned = extractMostMentionedUsers(tweets, limit)
+            return res.status(200).json(mostMentioned)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(500).json({err: err.toString()})
         })
 })
 

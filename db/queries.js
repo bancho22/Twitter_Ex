@@ -15,6 +15,25 @@ export function getNumOfUsers(coll){
 }
 
 
+export function getTweetsWithMentions(coll){
+    return new Promise((resolve, reject) => {
+        let cur = coll.aggregate([
+            {$match: {text: new RegExp('@\\w+', 'ig')}},
+            {$group: {_id: null, text: {$push: '$text'}}}
+        ])
+
+        cur.toArray()
+            .then(res => {
+                // console.log(res)
+                return resolve(res[0].text)
+            })
+            .catch(err => {
+                return reject(err)
+            })
+    })
+}
+
+
 export function getMostActiveUsers(coll, limit){
     return new Promise((resolve, reject) => {
         let cur = coll.aggregate([
